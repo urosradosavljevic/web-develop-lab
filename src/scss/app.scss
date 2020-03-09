@@ -8,6 +8,14 @@ html {
   margin: 0;
 }
 
+@media (max-width: 1000px) {
+  body>*:not(#small-screen){
+      display:none;
+  }
+  #small-screen{
+    display:block;
+  }
+}
 :root {
   --primary-color: #d8d9dd;
 }
