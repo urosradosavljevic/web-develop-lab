@@ -1,0 +1,185 @@
+.body-texttospeach {
+  $main-font-color: #48A8A1;
+  $black-background-color: rgb(25, 25, 25);
+  $gray-background-color: rgba(255, 255, 255, 0.096);
+  
+  font-family: Poppins;
+  font-weight: 300;
+  color: $main-font-color;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to bottom left, #242424, #272727);
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+
+  .voicemodulator {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    margin-top: 1em;
+    width: 300px;
+  }
+  header {
+    text-align: center;
+  }
+  header h4 {
+    text-transform: uppercase;
+    font-weight: 900;
+    letter-spacing: 0.3rem;
+    font-size: 1.3em;
+    margin: 1.5rem 0;
+    color: white;
+  }
+
+  .voice {
+    padding: 0.5em;
+    font-size: 1em;
+    color:  $main-font-color;
+    background: rgb(53, 53, 53);
+    border: none;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .modulate-controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin: 3em 0;
+  }
+  .modulate-controls > div > * {
+    display: inline-block;
+  }
+
+  .modulate-controls > div {
+    display: flex;
+    flex-direction: column;
+    width: 40px;
+    height: 110px;
+  }
+
+  .modulate-controls label {
+    margin: 0 auto;
+    font-size: 0.8em;
+    font-weight: 300;
+    color: $main-font-color;
+    text-transform: uppercase;
+  }
+
+  .input-text {
+    background: $gray-background-color;
+    color:  $main-font-color;
+    padding: 0.5em;
+    font-size: 1em;
+    border: none;
+    outline: none;
+  }
+
+  .playing {
+    color:  $main-font-color;
+    border: 0.3rem solid  #FFA000 !important;
+    &::after {
+      color: #FFA000 !important;
+    }
+  }
+
+  .playing-controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin-top: 1em;
+  }
+  .playing-controls button {
+    margin: 2rem;
+    width: 6rem;
+    height: 4rem;
+    background: #080808;
+    border-radius: 2px;
+    border: 0.3rem solid white;
+    outline: none;
+  }
+
+  .playing-controls button.play::after {
+    color: white;
+    content: "►";
+    position: relative;
+    top: 50%;
+    font-size: 3rem;
+  }
+  .playing-controls button.stop::after {
+    color: white;
+    position: relative;
+    top: -1.1rem;
+    font-size: 4rem;
+    content: "■";
+  }
+
+  .playing-controls button:hover {
+    cursor: pointer;
+  }
+  .playing-controls button:active::after {
+    color: #48A8A1;
+  }
+  .playing-controls button:active {
+    border: 0.3rem solid #48A8A1;
+    cursor: pointer;
+  }
+  /*
+      Range
+  */
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    display: inline-block;
+    height: 4px;
+    width: 70px;
+    margin: 17px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    transform: rotate(-90deg);
+    transform-origin: 35px 35px;
+    -webkit-transition: 0.2s;
+    transition: opacity 0.2s;
+    cursor: pointer;
+  }
+
+  input[type="range"]:hover {
+    opacity: 1;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 19px;
+    height: 60px;
+    background: $black-background-color;
+    background: linear-gradient(
+      to right,
+      black 40%,
+      white 40%,
+      white 60%,
+      black 60%,
+      black 100%
+    );
+    cursor: pointer;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 19px;
+    height: 60px;
+    background: $black-background-color;
+    background: linear-gradient(
+      to right,
+      black 40%,
+      white 40%,
+      white 60%,
+      black 60%,
+      black 100%
+    );
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,169 @@
+.clock {
+  display: block;
+  width: 20rem;
+  height: 20rem;
+  border-radius: 100%;
+  position: relative;
+  margin: 2rem;
+}
+
+.clock-surface {
+  width: 100%;
+  height: 100%;
+  background: #00a8cc;
+  position: relative;
+  top: -5rem;
+}
+
+.clock-surface::before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 20rem;
+  height: 20rem;
+  top: calc(50% - 10rem);
+  left: calc(50% - 10rem);
+  border-radius: 50%;
+  background: linear-gradient(to bottom right, #00a8cc, #00a8cc);
+  box-shadow: inset 80px 80px 130px #00a8cc, inset -80px -80px 130px #00728b,
+    50px 50px 90px #00b0d8, -50px -50px 90px #008baa;
+  filter: blur(12px);
+}
+
+.clock-face {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 100%;
+  margin: auto;
+  box-shadow: inset 5px 5px 35px black;
+}
+.clock-surface > .clock-face-surface {
+  position: relative;
+  width: 20rem;
+  height: 20rem;
+  top: calc(50% - 10rem);
+  left: calc(50% - 10rem);
+}
+.clock-face::before,
+.clock-face-surface::before {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 600;
+  position: absolute;
+  top: 25%;
+  left: 44%;
+}
+.clock-surface .clock-face-surface::before {
+  content: attr(data-title);
+  top: 140%;
+  left: 37%;
+  text-transform: uppercase;
+  font-size: 150%;
+}
+.hand {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 50%;
+}
+
+.hand > span {
+  background-color: black;
+  display: block;
+  position: absolute;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.158);
+}
+
+.hand-hours > span {
+  width: 2%;
+  height: 25%;
+  top: 25%;
+  left: 49%;
+}
+.hand-minutes > span {
+  width: 1.5%;
+  height: 40%;
+  top: 10%;
+  left: 49.25%;
+}
+
+.hand-seconds > span {
+  width: 1%;
+  height: 55%;
+  top: 5%;
+  left: 49.5%;
+}
+
+.hand-minutes,
+.hand-seconds {
+  transition: transform 0.3s cubic-bezier(0.4, 2.08, 0.55, 0.44);
+}
+.clock-surface .hand > span {
+  background-color: black;
+  border-radius: 5px;
+}
+.clock-surface .hand-seconds > span {
+  height: 30%;
+  top: 15%;
+}
+.clock-surface .hand-minutes > span {
+  height: 25%;
+  top: 20%;
+}
+.clock-surface .hand-hours > span {
+  height: 15%;
+  top: 30%;
+}
+.marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 50%;
+}
+
+.clock-surface .marker {
+  opacity: 0.05;
+}
+
+.clock-surface .marker::after {
+  width: 1%;
+}
+.marker::after {
+  display: block;
+  position: absolute;
+  content: "";
+  height: 13rem;
+  width: 0.5%;
+  top: 0;
+  left: 50%;
+  border-top: 3rem solid black;
+  border-bottom: 3rem solid black;
+}
+
+.marker1 {
+  transform: rotateZ(30deg);
+}
+
+.marker2 {
+  transform: rotateZ(60deg);
+}
+
+.marker3 {
+  transform: rotateZ(90deg);
+}
+
+.marker4 {
+  transform: rotateZ(120deg);
+}
+
+.marker5 {
+  transform: rotateZ(150deg);
+}

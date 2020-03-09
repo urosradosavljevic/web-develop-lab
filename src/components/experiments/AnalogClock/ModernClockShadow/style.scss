@@ -1,0 +1,94 @@
+.clock {
+  display: block;
+  width: 20rem;
+  height: 20rem;
+  border-radius: 100%;
+  position: relative;
+  margin: 2rem;
+}
+
+.clock-face {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 100%;
+  margin: auto;
+  box-shadow: inset 5px 5px 35px black;
+}
+
+.clock-face::before {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 600;
+  position: absolute;
+  top: 25%;
+  left: 44%;
+}
+
+.clock-shadow {
+  top: 5rem;
+}
+.clock-shadow .clock-face::before {
+  content: "Los Angeles";
+  top: 25%;
+  left: 36%;
+}
+.clock-shadow .clock-face::after {
+  position: absolute;
+  top: 47.5%;
+  left: 47.5%;
+  content: "";
+  width: 5%;
+  height: 5%;
+  background-color: black;
+  border-radius: 100%;
+}
+.digital {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 600;
+  position: absolute;
+  top: 70%;
+  left: 34%;
+}
+
+.hand {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 50%;
+}
+
+.hand > span {
+  background-color: black;
+  display: block;
+  position: absolute;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.158);
+}
+
+.hand-hours > span {
+  width: 2%;
+  height: 25%;
+  top: 25%;
+  left: 49%;
+}
+.hand-minutes > span {
+  width: 1.5%;
+  height: 40%;
+  top: 10%;
+  left: 49.25%;
+}
+
+.hand-seconds > span {
+  width: 1%;
+  height: 55%;
+  top: 5%;
+  left: 49.5%;
+}
+
+.hand-minutes,
+.hand-seconds {
+  transition: transform 0.3s cubic-bezier(0.4, 2.08, 0.55, 0.44);
+}
