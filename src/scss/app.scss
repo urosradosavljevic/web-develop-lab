@@ -7,6 +7,9 @@ html {
   box-sizing: inherit;
   margin: 0;
 }
+#small-screen{
+  display:none;
+}
 
 @media (max-width: 1000px) {
   body>*:not(#small-screen){
