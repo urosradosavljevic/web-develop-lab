@@ -7,18 +7,7 @@ html {
   box-sizing: inherit;
   margin: 0;
 }
-#small-screen{
-  display:none;
-}
 
-@media (max-width: 1000px) {
-  body>*:not(#small-screen){
-      display:none;
-  }
-  #small-screen{
-    display:block;
-  }
-}
 :root {
   --primary-color: #d8d9dd;
 }
