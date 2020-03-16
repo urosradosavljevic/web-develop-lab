@@ -24,7 +24,7 @@ export const Drumkit = () => {
       audio.currentTime = 0;
       const playPromise = audio.play();
       playPromise !== undefined &&
-        playPromise.then(() => {}).catch(err => console.log(err));
+        playPromise.then(() => {}).catch(err => console.error(err));
       key.classList.add("playing");
     }
   };
@@ -35,7 +35,7 @@ export const Drumkit = () => {
       audio.currentTime = 0;
       const playPromise = audio.play();
       playPromise !== undefined &&
-        playPromise.then(() => {}).catch(err => console.log(err));
+        playPromise.then(() => {}).catch(err => console.error(err));
       key.classList.add("playing");
     }
   };

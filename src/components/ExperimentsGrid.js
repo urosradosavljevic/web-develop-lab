@@ -1,5 +1,5 @@
 import React from "react";
-import drumBoxPreview from "../img/drumbox-preview.JPG";
+import drumBoxPreview from "../img/drumbox-preview.jpg";
 import flexGalleryPreview from "../img/flex-galery-preview.jpg";
 import cssVariablePreview from "../img/css-variables-preview.jpg";
 import followAlongPreview from "../img/followalongnav-preview.jpg";

@@ -36,7 +36,6 @@ export const ClickNDrag = () => {
         onMouseUp={() => setIsDown(false)}
         onMouseDown={mouseDown}
         onMouseMove={mouseMove}
-        onScroll={console.log("op")}
         className="body-clickndrag"
       >
         <div ref={drag} className={isDown ? "items active" : "items"}>

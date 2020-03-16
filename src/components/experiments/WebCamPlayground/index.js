@@ -2,23 +2,16 @@ import React, { useState, useEffect, useRef } from "react";
 import "./style.scss";
 import { Header } from "../Header";
 import { SimpleDialog } from "../../SimpleDialog";
+import { WebCamStream } from "./components/WebCamStream";
 
 import { getAverageRGB } from "./helpers";
+import { CHARSET, GREEN_INITIAL } from "./consts";
 
 import snapSoundSrc from "./media/snap.mp3";
 import weatherImgSrc from "./media/weather_report.JPG";
-import { ToggleRadioBtnSimple } from "../../ToggleRadioBtnSimple";
-import { ToggleCheckBtnSimple } from "../../ToggleCheckBtnSimple";
-import { ColorRangeSlider } from "../../ColorRangeSlider";
-
-const greenInitial = {
-  rmin: 100,
-  rmax: 200,
-  gmin: 50,
-  gmax: 200,
-  bmin: 50,
-  bmax: 200
-};
+import { BlurEffectAdjust } from "./components/BlurEffectAdjust";
+import { GreenScreenAdjust } from "./components/GreenScreenAdjust";
+import { EffectControls } from "./components/EffectControls";
 
 export const WebCamPlayground = () => {
   const requestAnimationFrame =
@@ -30,12 +23,18 @@ export const WebCamPlayground = () => {
   const cancelAnimationFrame =
     window.cancelAnimationFrame || window.mozCancelAnimationFrame;
 
+  let animationRequest;
+
   const [charsetFlag, setCharsetFlag] = useState(false);
   const [fontHeight, setFontHeight] = useState(20);
   const [camFilter, setCamFilter] = useState("blureffect");
-  const [greenScreenRange, setGreenScreenRange] = useState(greenInitial);
+  const [greenScreenRange, setGreenScreenRange] = useState(GREEN_INITIAL);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogContent, setDialogContent] = useState({title:"",content:"",btnText:""});
+  const [dialogContent, setDialogContent] = useState({
+    title: "",
+    content: "",
+    btnText: ""
+  });
 
   let video = useRef();
   let outputCanvas = useRef();
@@ -48,45 +47,67 @@ export const WebCamPlayground = () => {
   let photoStrip = useRef();
   let weatherReportImg = useRef();
 
-  const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&()/\\+<>";
-  let animationRequest;
   // setup canvases
   useEffect(() => {
     hiddenCtx.current = hiddenCanvas.current.getContext("2d");
     outputCtx.current = outputCanvas.current.getContext("2d");
     backgroundCtx.current = backgroundCanvas.current.getContext("2d");
-    setDialogContent({
-      title: "Instructions",
-      content: "Use space button to take picture, to download desired picture click on it.",
-      btnText: "Got it!"
-     });
-     handleDialogOpen();
+    handleDialogOpen(
+      "Instructions",
+      "Use space button to take picture, to download desired picture click on it.",
+      "Got it!"
+    );
   }, []);
 
+  // attaching, detaching handlers
   useEffect(() => {
     document.addEventListener("keydown", takePhoto);
     return () => {
-      cancelAnimationFrame(animationRequest)
+      cancelAnimationFrame(animationRequest);
       document.removeEventListener("keydown", takePhoto);
-      console.log("Evo")
     };
-  },[]);
+  }, []);
 
+  // handle filter change
   useEffect(() => {
     changeEffect();
-    if(camFilter==="greenscreen"){
-       setDialogContent({
-      title: "Instructions",
-      content: "Find color spectrum (of colors you don't want to be shown) by changing red, green and blue colors limits",
-      btnText: "Got it!"
-    });
-    handleDialogOpen();
+    if (camFilter === "greenscreen") {
+      handleDialogOpen(
+        "Instructions",
+        "Find color spectrum (of colors you don't want to be shown) by changing red, green and blue colors limits",
+        "Got it!"
+      );
+    } else if (camFilter === "blureffect") {
+      handleDialogOpen(
+        "Instructions",
+        "Change pixel size or font size (ASCII mode) by dragging pixel size slider",
+        "Got it!"
+      );
     }
-   
-  }, [camFilter, charsetFlag]);
+  }, [camFilter]);
+
+  // handle filter adjust
+  useEffect(() => {
+    changeEffect();
+  }, [greenScreenRange, charsetFlag, fontHeight]);
+
+  // handlers
+  const handleErrorWebCamError = err => {
+    handleDialogOpen(
+      "Warning!",
+      `You have to allow webcam to use this app, ${err}`,
+      "Cancel"
+    );
+    console.error("You have to allow webcam to use this app");
+  };
 
   //Dialog handlers
-  const handleDialogOpen = () => {
+  const handleDialogOpen = (title, content, btnText) => {
+    setDialogContent({
+      title,
+      content,
+      btnText
+    });
     setDialogOpen(true);
   };
 
@@ -94,24 +115,42 @@ export const WebCamPlayground = () => {
     setDialogOpen(false);
   };
 
-  // get user video
-  useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: false })
-      .then(stream => {
-        video.current.srcObject = stream;
-        video.current.play();
-      })
-      .catch(err => {
-        setDialogContent({
-          title: "Warning!",
-          content: `You have to allow webcam to use this app, ${err}`,
-          btnText: "Cancel"
-        });
-        handleDialogOpen();
-        console.error("You have to allow webcam to use this app");
-      });
-  });
+  // effect change handler
+  const changeEffect = e => {
+    const { videoWidth: width, videoHeight: height } = video.current;
+    [backgroundCanvas.current.width, backgroundCanvas.current.height] = [
+      width,
+      height
+    ];
+
+    if (camFilter === "greenscreen") {
+      setCanvasBackground();
+    } else if (camFilter === "blureffect") {
+      setCanvasBackground();
+    }
+    paintToCanvas();
+  };
+
+  const takePhoto = e => {
+    if (e.key === " ") {
+      setCanvasBackground();
+      //play sound
+      snapSound.current.currentTime = 0;
+      snapSound.current.play();
+      //merge with background
+      backgroundCtx.current.drawImage(outputCanvas.current, 0, 0);
+      //extract data from canvas
+      const data = backgroundCanvas.current.toDataURL("image/png", 1.0);
+      const link = document.createElement("a");
+      link.href = data;
+      link.classList.add("photoshot");
+      link.setAttribute("download", "senf");
+      link.innerHTML = `<img src=${data} alt="another photo" >`;
+      photoStrip.current.insertBefore(link, photoStrip.current.firstChild);
+      //clear background canvas
+      setCanvasBackground();
+    }
+  };
 
   // single frame modulator
   const paintToCanvas = () => {
@@ -152,44 +191,9 @@ export const WebCamPlayground = () => {
     }
     animationRequest = requestAnimationFrame(paintToCanvas);
   };
-  // run on effect change
-  const changeEffect = e => {
-    const { videoWidth: width, videoHeight: height } = video.current;
-    [backgroundCanvas.current.width, backgroundCanvas.current.height] = [
-      width,
-      height
-    ];
 
-    if (camFilter === "greenscreen") {
-      setCanvasBackground();
-    } else if (camFilter === "blureffect") {
-      setCanvasBackground();
-    }
-    paintToCanvas();
-  };
-
-  const takePhoto = e => {
-    if (e.key === " ") {
-      setCanvasBackground();
-      //play sound
-      snapSound.current.currentTime = 0;
-      snapSound.current.play();
-      //merge with background
-      backgroundCtx.current.drawImage(outputCanvas.current, 0, 0);
-      //extract data from canvas
-      const data = backgroundCanvas.current.toDataURL("image/png", 1.0);
-      const link = document.createElement("a");
-      link.href = data;
-      link.classList.add("photoshot");
-      link.setAttribute("download", "senf");
-      link.innerHTML = `<img src=${data} alt="another photo" >`;
-      photoStrip.current.insertBefore(link, photoStrip.current.firstChild);
-      //clear background canvas
-      setCanvasBackground();
-    }
-  };
-
-  // FILTERS
+  // Filters
+  // Red filter
   const redEffect = (width, height) => {
     let pixels = hiddenCtx.current.getImageData(0, 0, width, height);
 
@@ -201,7 +205,7 @@ export const WebCamPlayground = () => {
 
     outputCtx.current.putImageData(pixels, 0, 0);
   };
-
+  // RGB split filter
   const rgbSplit = (width, height) => {
     let pixels = hiddenCtx.current.getImageData(0, 0, width, height);
 
@@ -213,7 +217,7 @@ export const WebCamPlayground = () => {
 
     outputCtx.current.putImageData(pixels, 0, 0);
   };
-
+  // Green Screen filter
   const greenScreen = (width, height) => {
     let pixels = hiddenCtx.current.getImageData(0, 0, width, height);
 
@@ -236,16 +240,7 @@ export const WebCamPlayground = () => {
 
     outputCtx.current.putImageData(pixels, 0, 0);
   };
-
-  const greenAdjust = e => {
-    const [name, value] = [e.currentTarget.name, e.currentTarget.value];
-
-    setGreenScreenRange({
-      ...greenScreenRange,
-      [name]: parseInt(value)
-    });
-  };
-
+  // Blur effect filter
   const blurEffect = (width, height) => {
     outputCtx.current.textBaseline = "top";
     outputCtx.current.font = `${fontHeight}px Cosolas`;
@@ -267,7 +262,7 @@ export const WebCamPlayground = () => {
 
         if (charsetFlag) {
           const randomCharacter =
-            charset[Math.floor(Math.random() * charset.length)];
+            CHARSET[Math.floor(Math.random() * CHARSET.length)];
           outputCtx.current.fillText(randomCharacter, x, y);
         } else {
           outputCtx.current.fillRect(x, y, fontWidth, fontHeight);
@@ -275,7 +270,16 @@ export const WebCamPlayground = () => {
       }
     }
   };
-  // End of filters
+
+  // Green screen filter adjust
+  const greenAdjust = e => {
+    const [name, value] = [e.currentTarget.name, e.currentTarget.value];
+
+    setGreenScreenRange({
+      ...greenScreenRange,
+      [name]: parseInt(value)
+    });
+  };
 
   const setCanvasBackground = () => {
     const [width, height] = [
@@ -318,133 +322,33 @@ export const WebCamPlayground = () => {
         <div className="sidebar">
           <div className="player-wrapper">
             <h6>Raw Preview</h6>
-            <video ref={video} className="player"></video>
+            <WebCamStream
+              ref={video}
+              className="player"
+              handleError={handleErrorWebCamError}
+            />
           </div>
 
           <div className="controls">
-            <ToggleRadioBtnSimple
-              title="Blur Effect"
-              name="effect"
-              id="blureffect"
-              checked={camFilter === "blureffect"}
-              onChange={e => {
-                setCamFilter(e.target.id);
-                changeEffect();
-              }}
+            <EffectControls
+              camFilter={camFilter}
+              setCamFilter={setCamFilter}
+              changeEffect={changeEffect}
             />
 
-            <ToggleRadioBtnSimple
-              title="Red Effect"
-              name="effect"
-              id="redeffect"
-              checked={camFilter === "redeffect"}
-              onChange={e => {
-                setCamFilter(e.target.id);
-                changeEffect();
-              }}
+            <BlurEffectAdjust
+              camFilter={camFilter}
+              charsetFlag={charsetFlag}
+              setCharsetFlag={setCharsetFlag}
+              fontHeight={fontHeight}
+              setFontHeight={setFontHeight}
             />
 
-            <ToggleRadioBtnSimple
-              title="RGB Split"
-              name="effect"
-              id="rgbsplit"
-              checked={camFilter === "rgbsplit"}
-              onChange={e => {
-                setCamFilter(e.target.id);
-                changeEffect();
-              }}
+            <GreenScreenAdjust
+              camFilter={camFilter}
+              greenAdjust={greenAdjust}
+              greenScreenRange={greenScreenRange}
             />
-
-            <ToggleRadioBtnSimple
-              title="Green Screen"
-              name="effect"
-              id="greenscreen"
-              checked={camFilter === "greenscreen"}
-              onChange={e => {
-                setCamFilter(e.target.id);
-                changeEffect();
-              }}
-            />
-
-            <div
-              className={
-                camFilter === "blureffect"
-                  ? "ascii-filter-controls display-flex"
-                  : "ascii-filter-controls"
-              }
-            >
-              <h5>Blur Filter Controls</h5>
-
-              <ToggleCheckBtnSimple
-                title="ASCII"
-                name="ascii-flag"
-                value={charsetFlag}
-                onChange={() => setCharsetFlag(!charsetFlag)}
-              />
-
-              <label htmlFor="ascii">
-                Pixel Size:
-                <input
-                  type="range"
-                  min={10}
-                  max={40}
-                  value={fontHeight}
-                  onChange={e => setFontHeight(parseInt(e.currentTarget.value))}
-                />
-              </label>
-            </div>
-
-            <div
-              className={
-                camFilter === "greenscreen"
-                  ? "green-screen-controls display-flex"
-                  : "green-screen-controls"
-              }
-            >
-              <h5>Green Screen Controls</h5>
-
-              <ColorRangeSlider
-                name="rmin"
-                title="Red Min:"
-                value={greenScreenRange.rmin}
-                onChange={greenAdjust}
-              />
-
-              <ColorRangeSlider
-                name="rmax"
-                title="Red Max:"
-                value={greenScreenRange.rmax}
-                onChange={greenAdjust}
-              />
-
-              <ColorRangeSlider
-                name="gmin"
-                title="Green Min:"
-                value={greenScreenRange.gmin}
-                onChange={greenAdjust}
-              />
-
-              <ColorRangeSlider
-                name="gmax"
-                title="Green Max:"
-                value={greenScreenRange.gmax}
-                onChange={greenAdjust}
-              />
-
-              <ColorRangeSlider
-                name="bmin"
-                title="Blue Min:"
-                value={greenScreenRange.bmin}
-                onChange={greenAdjust}
-              />
-
-              <ColorRangeSlider
-                name="bmax"
-                title="Blue Max:"
-                value={greenScreenRange.bmax}
-                onChange={greenAdjust}
-              />
-            </div>
           </div>
         </div>
 

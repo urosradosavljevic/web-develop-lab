@@ -10,7 +10,6 @@ export const CSSVariables = () => {
       const target = e.currentTarget
     const [name,value,sizing,checked] = [target.name,target.value,target.dataset.sizing,target.checked]
     let property = "";
-    console.log("IOA",name,value,sizing,checked)
     switch (name) {
       case "size":
         property = [`--${name}`, value + sizing];
